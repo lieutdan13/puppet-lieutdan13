@@ -62,7 +62,7 @@ define('WPLANG', '<%= scope.lookupvar('wordpress::options')['WPLANG'] ||= "" %>'
 define('WP_DEBUG', <%= scope.lookupvar('wordpress::options')['WP_DEBUG'] ||= "false" %>);
 
 /* Multisite */
-define('WP_ALLOW_MULTISITE', <%= scope.lookupvar('wordpress::options')['WP_ALLOW_MULTISITE'] ||= "true" %>);
+define('WP_ALLOW_MULTISITE', <%= scope.lookupvar('wordpress::options')['WP_ALLOW_MULTISITE'] ||= "false" %>);
 <%- if scope.lookupvar('wordpress::options')['MULTISITE'] == true -%>
 define('MULTISITE', true);
 define('SUBDOMAIN_INSTALL', true);
@@ -74,10 +74,10 @@ define('BLOG_ID_CURRENT_SITE', 1);
 $shardb_hash_length = <%= scope.lookupvar('wordpress::options')['shardb_hash_length'] ||= 2 %>;
 $shardb_prefix = "<%= scope.lookupvar('wordpress::options')['shardb_prefix'] ||= 'wordpress_mu' %>";
 $shardb_dataset = "<%= scope.lookupvar('wordpress::options')['shardb_dataset'] ||= 'global' %>";
-$enable_home_db = <%= scope.lookupvar('wordpress::options')['enable_home_db'] ||= true %>;
+$enable_home_db = <%= scope.lookupvar('wordpress::options')['enable_home_db'] ||= "true" %>;
 $num_vipdbs = <%= scope.lookupvar('wordpress::options')['num_vipdbs'] ||= 0 %>;
 $shardb_master_read = <%= scope.lookupvar('wordpress::options')['shardb_master_read'] ||= 1 %>;
-$shardb_local_db = <%= scope.lookupvar('wordpress::options')['shardb_local_db'] ||= true %>;
+$shardb_local_db = <%= scope.lookupvar('wordpress::options')['shardb_local_db'] ||= "true" %>;
 require_once('db-settings.php');
 <%- end -%>
 

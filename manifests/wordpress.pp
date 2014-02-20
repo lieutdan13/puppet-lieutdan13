@@ -45,6 +45,15 @@ class lieutdan13::wordpress(
             $options['MULTISITE'] = true
         }
 
+        # This is the only way I could force unzip to be installed before wordpress was installed
+        # Adding require => Package['unzip'] to the wordpress class below was not enough
+        file { 'wordpress_dependency_workaround':
+            ensure  => present,
+            path    => '/tmp/wordpress_dependency_workaround',
+            require => Package['unzip'],
+            before  => Class['::wordpress::install'],
+        }
+
         class { '::wordpress':
             db_name         => $db_name,
             db_host         => $db_host,

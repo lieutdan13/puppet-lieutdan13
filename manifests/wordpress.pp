@@ -56,6 +56,7 @@ class lieutdan13::wordpress(
             template        => 'lieutdan13/wordpress/wp-config.php.erb',
             web_server      => '',
             web_virtualhost => '',
+            require         => Package['unzip'],
         }
     }
 }

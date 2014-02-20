@@ -20,7 +20,7 @@ class lieutdan13::wordpress(
     } else {
 
         $real_install_source = $install_source ? {
-            ''      => "'http://wordpress.org/wordpress-${version}.zip",
+            ''      => "http://wordpress.org/wordpress-${version}.zip",
             default => $install_source,
         }
 

@@ -12,11 +12,11 @@ class lieutdan13::wordpress(
 ) {
 
     if $db_password == '' {
-        err("You must define a \$db_password for lieutdan13::wordpress")
+        notify { "You must define a \$db_password for lieutdan13::wordpress": loglevel => err }
     } elsif $db_user == '' {
-        err("You must define a \$db_user for lieutdan13::wordpress")
+        notify { "You must define a \$db_user for lieutdan13::wordpress": loglevel => err }
     } elsif $version == '' and $install_source == '' {
-        err("You must define a \$version or \$install_source for lieutdan13::wordpress")
+        notify { "You must define a \$version or \$install_source for lieutdan13::wordpress": loglevel => err }
     } else {
 
         $real_install_source = $install_source ? {

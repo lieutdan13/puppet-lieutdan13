@@ -33,14 +33,14 @@ class lieutdan13::wordpress(
         }
 
         if $multisite == false {
-            $options += { 'WP_ALLOW_MULTISITE' => false }
-            $options += { 'MULTISITE' => false }
+            $options['WP_ALLOW_MULTISITE'] = false
+            $options['MULTISITE'] = false
         } elsif $multisite == 'allow' {
-            $options += { 'WP_ALLOW_MULTISITE' => true }
-            $options += { 'MULTISITE' => false }
+            $options['WP_ALLOW_MULTISITE'] = true
+            $options['MULTISITE'] = false
         } else {
-            $options += { 'WP_ALLOW_MULTISITE' => true }
-            $options += { 'MULTISITE' => true }
+            $options['WP_ALLOW_MULTISITE'] = true
+            $options['MULTISITE'] = true
         }
 
         class { '::wordpress':

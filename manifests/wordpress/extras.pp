@@ -11,6 +11,11 @@ class lieutdan13::wordpress::extras {
 
     #shardb plugin
     file { 'wpplugin_shardb_db-settings.php':
+        ensure  => $lieutdan13::wordpress::multisite ? {
+            false   => 'absent',
+            allow   => 'absent',
+            default => 'present',
+        },
         group   => root,
         mode    => '644',
         owner   => root,
@@ -18,6 +23,11 @@ class lieutdan13::wordpress::extras {
         source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/db-settings.php'
     }
     file { 'wpplugin_shardb_shardb-admin.php':
+        ensure  => $lieutdan13::wordpress::multisite ? {
+            false   => 'absent',
+            allow   => 'absent',
+            default => 'present',
+        },
         group   => root,
         mode    => '644',
         owner   => root,
@@ -25,6 +35,10 @@ class lieutdan13::wordpress::extras {
         source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/shardb-admin.php'
     }
     file { 'wpplugin_shardb_db.php':
+        ensure  => $lieutdan13::wordpress::multisite ? {
+            true    => 'present',
+            default => 'absent',
+        },
         group   => root,
         mode    => '644',
         owner   => root,

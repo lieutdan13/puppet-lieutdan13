@@ -1,4 +1,12 @@
 # Class lieutdan13::wordpress
+# $multisite                : There are different stages of initializing the multisite feature in Wordpress.
+#                             Here are the different values in order of the stages.
+#                             false   = Completely disabled. The Wordpress site will not give an option to create the Network
+#                             allow   = Enables the Network Setup in the Admin Dashboard Tools
+#                             migrate = Enables multisite and allows the Admin to migrate the databases from a single database
+#                                       to multiple databases
+#                             true    = Completely enabled and ready to use
+####################
 class lieutdan13::wordpress(
     $db_name     = 'wordpress',
     $db_host     = 'localhost',
@@ -24,10 +32,13 @@ class lieutdan13::wordpress(
             default => $install_source,
         }
 
-        if $multisite == 'migrating' {
+        if $multisite == false {
+            $options['WP_ALLOW_MULTISITE'] = false
+            $options['MULTISITE'] = false
+        } elsif $multisite == 'allow' {
             $options['WP_ALLOW_MULTISITE'] = true
             $options['MULTISITE'] = false
-        } elsif $multisite == true {
+        } else {
             $options['WP_ALLOW_MULTISITE'] = true
             $options['MULTISITE'] = true
         }

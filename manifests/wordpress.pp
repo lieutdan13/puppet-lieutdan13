@@ -19,6 +19,8 @@ class lieutdan13::wordpress(
     $install_source = '',
 ) {
 
+    include lieutdan13::essentials
+
     if $db_password == '' {
         notify { "You must define a \$db_password for lieutdan13::wordpress": loglevel => err }
     } elsif $db_user == '' {
@@ -56,7 +58,6 @@ class lieutdan13::wordpress(
             template        => 'lieutdan13/wordpress/wp-config.php.erb',
             web_server      => '',
             web_virtualhost => '',
-            require         => Package['unzip'],
         }
     }
 }

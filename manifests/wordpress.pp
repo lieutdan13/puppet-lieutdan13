@@ -15,7 +15,7 @@ class lieutdan13::wordpress(
         err("You must define a \$db_password for lieutdan13::wordpress")
     } elsif $db_user == '' {
         err("You must define a \$db_user for lieutdan13::wordpress")
-    } elsif $version == '' && $install_source == '' {
+    } elsif $version == '' and $install_source == '' {
         err("You must define a \$version or \$install_source for lieutdan13::wordpress")
     } else {
 

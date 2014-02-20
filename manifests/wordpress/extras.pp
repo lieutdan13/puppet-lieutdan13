@@ -21,7 +21,7 @@ class lieutdan13::wordpress::extras {
         mode    => '644',
         owner   => root,
         path    => "${::wordpress::real_data_dir}/db-settings.php",
-        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/db-settings.php'
+        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/db-settings.php',
         require => Class['::wordpress::install'],
     }
     file { 'wpplugin_shardb_shardb-admin.php':
@@ -34,7 +34,7 @@ class lieutdan13::wordpress::extras {
         mode    => '644',
         owner   => root,
         path    => "${::wordpress::real_data_dir}/wp-content/plugins/shardb-admin.php",
-        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/shardb-admin.php'
+        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/shardb-admin.php',
         require => Class['::wordpress::install'],
     }
     file { 'wpplugin_shardb_db.php':
@@ -46,7 +46,7 @@ class lieutdan13::wordpress::extras {
         mode    => '644',
         owner   => root,
         path    => "${::wordpress::real_data_dir}/wp-content/db.php",
-        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/db.php'
+        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/db.php',
         require => Class['::wordpress::install'],
     }
 }

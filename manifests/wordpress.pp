@@ -27,7 +27,7 @@ class lieutdan13::wordpress(
         if $multisite == 'migrating' {
             $options['WP_ALLOW_MULTISITE'] = true
             $options['MULTISITE'] = false
-        } elif $multisite == true {
+        } elsif $multisite == true {
             $options['WP_ALLOW_MULTISITE'] = true
             $options['MULTISITE'] = true
         }

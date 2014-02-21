@@ -43,6 +43,23 @@ class lieutdan13::wordpress(
         } else {
             $options['WP_ALLOW_MULTISITE'] = true
             $options['MULTISITE'] = true
+            if $options['shardb_prefix'] == undef {
+                $options['shardb_prefix'] = 'wordpress_mu'
+            }
+            if $options['shardb_dataset'] == undef {
+                $options['shardb_dataset'] = 'global'
+            }
+            if $options['enable_home_db'] == undef {
+                $options['enable_home_db'] = true
+            }
+            $global_db_name = "${options['shardb_prefix']}${options['shardb_dataset']}"
+            mysql::grant { "wordpress_server_grants_${::fqdn}_${global_db_name}":
+                mysql_db         => $global_db_name,
+                mysql_user       => $db_user,
+                mysql_password   => $db_password,
+                mysql_privileges => 'ALL',
+                mysql_host       => $db_host,
+            }
         }
 
         # This is the only way I could force unzip to be installed before wordpress was installed

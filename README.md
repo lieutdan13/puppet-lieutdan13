@@ -21,12 +21,13 @@ The installation of Wordpress onto a server using Puppet needs to be done in mul
     }
     ```
     
-2. Run puppet on the machine
-3. Initialize the first/primary blog for the Wordpress network by visiting the blog's url
+1. Run puppet on the machine
+1. Initialize the first/primary blog for the Wordpress network by visiting the blog's url
    * This assumes that the DNS and firewall are configured properly and you have access to the url in a browser
-4. Login to the blog's admin panel with the user created
-5. Go to Tools --> Network Setup and initialize the Network
-6. Set Multisite to be migrated by running the class with multisite =  'migrate'. For example:
+1. Login to the blog's admin panel with the user created
+1. Go to Tools --> Network Setup and initialize the Network
+1. Select "Sub-domains" and click "Install"
+1. Set Multisite to be migrated by running the class with multisite =  'migrate'. For example:
 
     ```Puppet
     class { 'lieutdan13::wordpress':
@@ -37,7 +38,19 @@ The installation of Wordpress onto a server using Puppet needs to be done in mul
     }
     ```
 
-7. Run puppet on the machine again
-8. Login again to the admin panel
-9. Go to Settings --> Network Settings and configure the blog accordingly
-10. Go to Plugins and activate SharDB site admin utilities network-wide
+1. Run puppet on the machine again
+1. Login again to the admin panel
+1. Go to My Sites --> Netwotk Admin --> Dashboard 
+1. Go to Settings --> Network Settings and configure the blog accordingly
+1. Go to Plugins and activate SharDB site admin utilities network-wide
+1. Go to Settings --> SharDB Migration and performa the migration of the sites
+1. Set Multisite to enabled by running the class with multisite =  true. For example:
+
+    ```Puppet
+    class { 'lieutdan13::wordpress':
+        db_password => 'random_password',
+        db_user     => 'wordpress',
+        multisite   => true,
+        version     => 'latest',
+    }
+    ```

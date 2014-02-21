@@ -39,6 +39,10 @@ class lieutdan13::wordpress(
             $options['main_site'] = $::fqdn
         }
 
+        if $options['plugins'] == undef {
+            $options['plugins'] = {}
+        }
+
         if $multisite == false {
             $options['WP_ALLOW_MULTISITE'] = false
             $options['MULTISITE'] = false

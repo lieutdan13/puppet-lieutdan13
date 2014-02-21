@@ -35,6 +35,10 @@ class lieutdan13::wordpress(
             default => $install_source,
         }
 
+        if $options['main_site'] == undef {
+            $options['main_site'] = $::fqdn
+        }
+
         if $multisite == false {
             $options['WP_ALLOW_MULTISITE'] = false
             $options['MULTISITE'] = false

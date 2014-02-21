@@ -71,6 +71,7 @@ define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
 
+<%- if scope.lookupvar('wordpress::options')['multidb'] -%>
 $shardb_hash_length = <%= scope.lookupvar('wordpress::options')['shardb_hash_length'] ||= 2 %>;
 $shardb_prefix = "<%= scope.lookupvar('wordpress::options')['shardb_prefix'] ||= 'wordpress_mu' %>";
 $shardb_dataset = "<%= scope.lookupvar('wordpress::options')['shardb_dataset'] ||= 'global' %>";
@@ -79,6 +80,7 @@ $num_vipdbs = <%= scope.lookupvar('wordpress::options')['num_vipdbs'] ||= 0 %>;
 $shardb_master_read = <%= scope.lookupvar('wordpress::options')['shardb_master_read'] ||= 1 %>;
 $shardb_local_db = <%= scope.lookupvar('wordpress::options')['shardb_local_db'] ? 'true' : 'false' %>;
 require_once('db-settings.php');
+<%- end -%>
 <%- end -%>
 
 /* That's all, stop editing! Happy blogging. */

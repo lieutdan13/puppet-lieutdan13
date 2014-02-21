@@ -14,6 +14,7 @@ class lieutdan13::wordpress(
     $db_type     = 'mysql',
     $db_user     = '',
     $multisite   = false,
+    $multidb     = false,
     $options     = {},
     $version     = 'latest',
     $install_source = '',
@@ -43,34 +44,38 @@ class lieutdan13::wordpress(
         } else {
             $options['WP_ALLOW_MULTISITE'] = true
             $options['MULTISITE'] = true
-            if $options['shardb_prefix'] == undef {
-                $options['shardb_prefix'] = 'wordpress_mu'
-            }
-            if $options['shardb_dataset'] == undef {
-                $options['shardb_dataset'] = 'global'
-            }
-            if $options['enable_home_db'] == undef {
-                $options['enable_home_db'] = true
-            }
-            if $options['shardb_local_db'] == undef {
-                $options['shardb_local_db'] = true
-            }
-            $global_db_name = "${options['shardb_prefix']}${options['shardb_dataset']}"
-            mysql::grant { "wordpress_server_grants_${::fqdn}_${global_db_name}":
-                mysql_db         => $global_db_name,
-                mysql_user       => $db_user,
-                mysql_password   => $db_password,
-                mysql_privileges => 'ALL',
-                mysql_host       => $db_host,
-            }
-            if $options['enable_home_db'] == true {
-                $home_db_name = "${options['shardb_prefix']}home"
-                mysql::grant { "wordpress_server_grants_${::fqdn}_${home_db_name}":
-                    mysql_db         => $home_db_name,
+            $options['multidb'] = $multidb
+
+            if $options['multidb'] {
+                if $options['shardb_prefix'] == undef {
+                    $options['shardb_prefix'] = 'wordpress_mu'
+                }
+                if $options['shardb_dataset'] == undef {
+                    $options['shardb_dataset'] = 'global'
+                }
+                if $options['enable_home_db'] == undef {
+                    $options['enable_home_db'] = true
+                }
+                if $options['shardb_local_db'] == undef {
+                    $options['shardb_local_db'] = true
+                }
+                $global_db_name = "${options['shardb_prefix']}${options['shardb_dataset']}"
+                mysql::grant { "wordpress_server_grants_${::fqdn}_${global_db_name}":
+                    mysql_db         => $global_db_name,
                     mysql_user       => $db_user,
                     mysql_password   => $db_password,
                     mysql_privileges => 'ALL',
                     mysql_host       => $db_host,
+                }
+                if $options['enable_home_db'] == true {
+                    $home_db_name = "${options['shardb_prefix']}home"
+                    mysql::grant { "wordpress_server_grants_${::fqdn}_${home_db_name}":
+                        mysql_db         => $home_db_name,
+                        mysql_user       => $db_user,
+                        mysql_password   => $db_password,
+                        mysql_privileges => 'ALL',
+                        mysql_host       => $db_host,
+                    }
                 }
             }
         }

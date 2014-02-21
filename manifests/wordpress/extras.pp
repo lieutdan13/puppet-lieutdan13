@@ -15,7 +15,10 @@ class lieutdan13::wordpress::extras {
         ensure  => $lieutdan13::wordpress::multisite ? {
             false   => 'absent',
             allow   => 'absent',
-            default => 'present',
+            default => $lieutdan13::wordpress::multidb ? {
+                true    => 'present',
+                default => 'absent',
+            },
         },
         group   => root,
         mode    => '644',
@@ -28,7 +31,10 @@ class lieutdan13::wordpress::extras {
         ensure  => $lieutdan13::wordpress::multisite ? {
             false   => 'absent',
             allow   => 'absent',
-            default => 'present',
+            default => $lieutdan13::wordpress::multidb ? {
+                true    => 'present',
+                default => 'absent',
+            },
         },
         group   => root,
         mode    => '644',
@@ -39,7 +45,10 @@ class lieutdan13::wordpress::extras {
     }
     file { 'wpplugin_shardb_db.php':
         ensure  => $lieutdan13::wordpress::multisite ? {
-            true    => 'present',
+            true    => $lieutdan13::wordpress::multidb ? {
+                true    => 'present',
+                default => 'absent',
+            },
             default => 'absent',
         },
         group   => root,

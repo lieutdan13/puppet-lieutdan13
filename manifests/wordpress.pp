@@ -50,7 +50,10 @@ class lieutdan13::wordpress(
                 $options['shardb_dataset'] = 'global'
             }
             if $options['enable_home_db'] == undef {
-                $options['enable_home_db'] = true
+                $options['enable_home_db'] = false
+            }
+            if $options['shardb_local_db'] == undef {
+                $options['shardb_local_db'] = true
             }
             $global_db_name = "${options['shardb_prefix']}${options['shardb_dataset']}"
             mysql::grant { "wordpress_server_grants_${::fqdn}_${global_db_name}":
@@ -59,6 +62,16 @@ class lieutdan13::wordpress(
                 mysql_password   => $db_password,
                 mysql_privileges => 'ALL',
                 mysql_host       => $db_host,
+            }
+            if $options['enable_home_db'] == true {
+                $home_db_name = "${options['shardb_prefix']}home"
+                mysql::grant { "wordpress_server_grants_${::fqdn}_${home_db_name}":
+                    mysql_db         => $home_db_name,
+                    mysql_user       => $db_user,
+                    mysql_password   => $db_password,
+                    mysql_privileges => 'ALL',
+                    mysql_host       => $db_host,
+                }
             }
         }
 

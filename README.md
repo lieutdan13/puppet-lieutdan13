@@ -25,7 +25,7 @@ The installation of Wordpress onto a server using Puppet needs to be done in mul
 3. Initialize the first/primary blog for the Wordpress network by visiting the blog's url
    * This assumes that the DNS and firewall are configured properly and you have access to the url in a browser
 4. Login to the blog's admin panel with the user created
-5. Go to Settings --> Network Setup and initialize the Network
+5. Go to Tools --> Network Setup and initialize the Network
 6. Set Multisite to be migrated by running the class with multisite =  'migrate'. For example:
 
     ```Puppet

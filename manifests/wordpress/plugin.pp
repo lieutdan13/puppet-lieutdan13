@@ -28,9 +28,9 @@ define lieutdan13::wordpress::plugin (
 #        extracted_dir   => $real_extracted_dir
 #    }
 
-    notify { "wp-plugin ${name} \$real_source_url": message => $real_source_url, log_level => debug, }
-    notify { "wp-plugin ${name} \$ensure": message => $ensure, log_level => debug, }
-    notify { "wp-plugin ${name} \$version": message => $version, log_level => debug, }
-    notify { "wp-plugin ${name} \$real_destination_dir": message => $real_destination_dir, log_level => debug, }
-    notify { "wp-plugin ${name} \$real_extracted_dir": message => $real_extracted_dir, log_level => debug, }
+    notify { "wp-plugin ${name} \$real_source_url": message => $real_source_url, loglevel => debug, }
+    notify { "wp-plugin ${name} \$ensure": message => $ensure, loglevel => debug, }
+    notify { "wp-plugin ${name} \$version": message => $version, loglevel => debug, }
+    notify { "wp-plugin ${name} \$real_destination_dir": message => $real_destination_dir, loglevel => debug, }
+    notify { "wp-plugin ${name} \$real_extracted_dir": message => $real_extracted_dir, loglevel => debug, }
 }

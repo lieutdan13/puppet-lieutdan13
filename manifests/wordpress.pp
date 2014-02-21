@@ -50,7 +50,7 @@ class lieutdan13::wordpress(
                 $options['shardb_dataset'] = 'global'
             }
             if $options['enable_home_db'] == undef {
-                $options['enable_home_db'] = false
+                $options['enable_home_db'] = true
             }
             if $options['shardb_local_db'] == undef {
                 $options['shardb_local_db'] = true

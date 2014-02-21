@@ -70,6 +70,7 @@ define('DOMAIN_CURRENT_SITE', '<%= @fqdn %>');
 define('PATH_CURRENT_SITE', '/');
 define('SITE_ID_CURRENT_SITE', 1);
 define('BLOG_ID_CURRENT_SITE', 1);
+define('SUNRISE', 'on');
 
 <%- if scope.lookupvar('wordpress::options')['multidb'] -%>
 $shardb_hash_length = <%= scope.lookupvar('wordpress::options')['shardb_hash_length'] ||= 2 %>;

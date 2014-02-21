@@ -58,4 +58,44 @@ class lieutdan13::wordpress::extras {
         source  => 'puppet:///modules/lieutdan13/wordpress/plugins/shardb/db.php',
         require => Class['::wordpress::install'],
     }
+
+    # WordPress MU Domain Mapping plugin
+    file { 'wpplugin_mu-domain-mapping_mu-plugins':
+        ensure  => $lieutdan13::wordpress::multisite ? {
+            false   => 'absent',
+            allow   => 'absent',
+            default => directory,
+        },
+        group   => root,
+        mode    => '644',
+        owner   => root,
+        path    => "${::wordpress::real_data_dir}/wp-content/mu-plugins",
+        require => Class['::wordpress::install'],
+    }
+    file { 'wpplugin_mu-domain-mapping_domain_mapping.php':
+        ensure  => $lieutdan13::wordpress::multisite ? {
+            false   => 'absent',
+            allow   => 'absent',
+            default => 'present',
+        },
+        group   => root,
+        mode    => '644',
+        owner   => root,
+        path    => "${::wordpress::real_data_dir}/wp-content/mu-plugins/domain_mapping.php",
+        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/wordpress-mu-domain-mapping/domain_mapping.php',
+        require => File['wpplugin_mu-domain-mapping_mu-plugins'],
+    }
+    file { 'wpplugin_mu-domain-mapping_sunrise.php':
+        ensure  => $lieutdan13::wordpress::multisite ? {
+            false   => 'absent',
+            allow   => 'absent',
+            default => 'present',
+        },
+        group   => root,
+        mode    => '644',
+        owner   => root,
+        path    => "${::wordpress::real_data_dir}/wp-content/sunrise.php",
+        source  => 'puppet:///modules/lieutdan13/wordpress/plugins/wordpress-mu-domain-mapping/sunrise.php',
+        require => Class['::wordpress::install'],
+    }
 }

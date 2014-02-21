@@ -1,0 +1,191 @@
+#!/bin/bash
+
+PATH='/bin:/sbin:/usr/bin:/usr/sbin'
+
+HOST_DOMAIN="`hostname -d`"
+HOST_NAME="`hostname --short`"
+MASTER_HOST_NAME="puppet"
+MASTER_IP=""
+
+if [ "`whoami`" != "root" ]; then
+	echo "You must be root"
+	exit 1
+fi
+
+OS_FAMILY=`lsb_release -is`
+OS_RELEASE=`lsb_release -rs`
+OS_CODENAME=`lsb_release -cs`
+HW_ARCH=`uname -i`
+
+function check_hostname() {
+	require_reboot=0
+
+	if [ "$HOST_DOMAIN" == "" ]; then
+		echo "The domain name is not set"
+		exit 1
+	fi
+	ping -c 3 $HOST_NAME &> /dev/null
+	if [ $? -ne 0 ]; then
+		echo "Adding a /etc/hosts record for $HOST_NAME"
+		echo -e "127.0.1.1\t$HOST_NAME" >> /etc/hosts
+		require_reboot=1
+		ping -c 3 $HOST_NAME &> /dev/null
+		if [ $? -ne 0 ]; then
+			echo "Unable to apply the FQDN of the host"
+			exit 1
+		fi
+	fi
+
+	if [ "`hostname`" != "$HOST_NAME" ]; then
+		echo "Setting the hostname of the machine to $HOST_NAME"
+		echo $HOST_NAME > /etc/hostname
+		hostname $HOST_NAME
+		require_reboot=1
+	fi
+
+	if [ $require_reboot -eq 1 ]; then
+		echo "To continue with the bootstrap process, the machine needs to reboot."
+		echo "After rebooting, please run this script again to continue the bootstrap process"
+		exit 1
+	fi
+}
+
+function check_master_connection() {
+
+	ping -c 3 $MASTER_HOST_NAME &> /dev/null
+	if [ $? -ne 0 ]; then
+		if [ "$MASTER_IP" == "" ]; then
+			echo "Unable to reach the Puppet Master. Is DNS setup correctly?"
+			exit 1
+		else
+			echo "Adding a static /etc/hosts record for $MASTER_HOST_NAME"
+			echo -e "$MASTER_IP\t$MASTER_HOST_NAME" >> /etc/hosts
+			ping -c 3 $MASTER_HOST_NAME &> /dev/null
+			if [ $? -ne 0 ]; then
+				echo "Unable to reach the Puppet Master"
+				exit 1
+			fi
+		fi
+	fi
+}
+
+function install_dependencies() {
+	if [ "$OS_FAMILY" == "Ubuntu" ] || [ "$OS_FAMILY" == "Debian" ]; then
+		echo "Installing python-software-properties"
+		apt-get -y --force-yes install python-software-properties > /dev/null
+		if [ ${?} -ne 0 ]; then
+			echo "Something went wrong with installing python-software-properties."
+			exit 1
+		fi
+		if [ ! -f /tmp/puppetlabs-release-${OS_CODENAME}.deb ]; then
+			echo "Downloading and importing the PuppetLabs Rep"
+			wget -c http://apt.puppetlabs.com/puppetlabs-release-${OS_CODENAME}.deb -O /tmp/puppetlabs-release-${OS_CODENAME}.deb > /dev/null
+			dpkg -i /tmp/puppetlabs-release-${OS_CODENAME}.deb
+			apt-get update > /dev/null
+		fi
+	elif [ "$OS_FAMILY" == "CentOS" ]; then
+		if [ "$OS_RELEASE" == "5.9" ] || [ "$OS_RELEASE" == "5.7" ]; then
+			if [ ! -f /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs ]; then
+				echo "Downloading and importing the PuppetLabs GPG key"
+				wget -c http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs -O /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs > /dev/null
+				rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-puppetlabs
+			fi
+
+			echo "Downloading and installing the PuppetLabs Repo"
+			if [ ! -f /tmp/puppetlabs-release-5-7.noarch.rpm ]; then
+				wget -c http://yum.puppetlabs.com/el/5/products/$HW_ARCH/puppetlabs-release-5-7.noarch.rpm -O /tmp/puppetlabs-release-5-7.noarch.rpm > /dev/null
+			fi
+			if [ -f /tmp/puppetlabs-release-5-7.noarch.rpm ]; then
+				yum install -y /tmp/puppetlabs-release-5-7.noarch.rpm > /dev/null
+			else
+				echo "Failed to download the PuppetLabs Repo RPM"
+				exit 1
+			fi
+
+			echo "Installing Ruby"
+			yum install -y ruby ruby-lib ruby-rdoc > /dev/null
+			if [ ${?} -ne 0 ]; then
+				echo "Something went wrong with installing ruby."
+				exit 1
+			fi
+		else
+			echo "Could not find a supported CentOS release"
+			exit 1
+		fi
+	fi
+}
+
+function install_puppetagent() {
+	if [ "$OS_FAMILY" == "Ubuntu" ] || [ "$OS_FAMILY" == "Debian" ]; then
+		echo "Installing Puppetagent"
+		apt-get -y install puppet > /dev/null
+		if [ ${?} -ne 0 ]; then
+			echo "Something went wrong with installing Puppet."
+			exit 1
+		fi
+	elif [ "$OS_FAMILY" == "CentOS" ]; then
+		echo "Installing Puppetagent"
+		yum -y install puppet > /dev/null
+		if [ ${?} -ne 0 ]; then
+			echo "Something went wrong with installing Puppet."
+			exit 1
+		fi
+	fi
+
+	/etc/init.d/puppet stop
+	if [ ${?} -ne 0 ]; then
+		echo "Something went wrong with stopping Puppet."
+		exit 1
+	fi
+
+	echo "Before continuing, run the following command on $MASTER_HOST_NAME:"
+	echo; echo "sudo puppet node clean $HOST_NAME"
+	echo "sudo puppet node clean $HOST_NAME.$HOST_DOMAIN"
+	echo; echo -n "Please press [ENTER] to contunue"
+	read
+	rm -f /var/lib/puppet/ssl/certs/$HOST_NAME.pem
+	rm -f /var/lib/puppet/ssl/certs/$HOST_NAME.$HOST_DOMAIN.pem
+	rm -f /var/lib/puppet/ssl/certificate_requests/$HOST_NAME.pem
+	rm -f /var/lib/puppet/ssl/certificate_requests/$HOST_NAME.$HOST_DOMAIN.pem
+	puppet agent --test --server $MASTER_HOST_NAME
+	echo "Please run the following command on $MASTER_HOST_NAME if autosign is disabled:"
+	echo; echo "sudo puppet cert list"
+	echo; echo "Depending on what is shown in the list, run ONE of the following commands:"
+	echo; echo "sudo puppet cert sign $HOST_NAME"
+	echo "sudo puppet cert sign $HOST_NAME.$HOST_DOMAIN"
+	echo; echo -n "Please press [ENTER] to contunue"
+	read
+
+	selection=""
+	until [ "$selection" == "C" ] || [ "$selection" == "Q" ]; do
+		echo -n "Do you want to make the changes to the machine, or just show what will be done? [C]hanges, [T]est (default), [Q]uit: "
+		read selection
+		selection=`echo $selection | tr '[a-z]' '[A-Z]'`
+
+		if [ "$selection" != "Q" ]; then
+			if [ "$selection" == "C" ]; then
+				noop=""
+			else
+				noop="--noop"
+				echo "Running Puppet in Test Mode"
+			fi
+			puppet agent --test --server $MASTER_HOST_NAME --waitforcert 30 --pluginsync $noop
+		fi
+	done
+
+	if [ "$OS_FAMILY" == "CentOS" ]; then
+		echo; echo;
+		echo "Add the following line to /etc/sysconfig/iptables"
+		echo "-A RH-Firewall-1-INPUT -p tcp -m state --state NEW -m tcp --dport 5666 -j ACCEPT"
+	fi
+
+	echo; echo;
+	echo "To complete the bootstrap process,"
+	echo "a reboot is recommended or"
+	echo "eth0 will need to be restarted."
+}
+
+check_hostname
+check_master_connection
+install_dependencies
+install_puppetagent

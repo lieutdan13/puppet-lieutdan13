@@ -1,5 +1,8 @@
 # Class lieutdan13::wordpress::extras
 class lieutdan13::wordpress::extras {
+
+    include lieutdan13::wordpress::plugins
+
     #htaccess
     file { 'wordpress_htaccess':
         content => template('lieutdan13/wordpress/htaccess.erb'),

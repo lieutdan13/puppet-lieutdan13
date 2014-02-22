@@ -55,7 +55,12 @@ function check_master_connection() {
 	ping -c 3 $MASTER_HOST_NAME &> /dev/null
 	if [ $? -ne 0 ]; then
 		if [ "$MASTER_IP" == "" ]; then
-			echo "Unable to reach the Puppet Master. Is DNS setup correctly?"
+			echo -n "Please enter the IP of the Puppet Master: "
+			read MASTER_IP
+		fi
+		ping -c 3 $MASTER_IP &> /dev/null
+		if [ $? -ne 0 ]; then
+			echo "Unable to reach the Puppet Master by IP."
 			exit 1
 		else
 			echo "Adding a static /etc/hosts record for $MASTER_HOST_NAME"

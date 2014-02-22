@@ -17,6 +17,26 @@ OS_RELEASE=`lsb_release -rs`
 OS_CODENAME=`lsb_release -cs`
 HW_ARCH=`uname -i`
 
+function verify_hostname() {
+	echo -n "The domain is \"$HOST_DOMAIN\". Is this correct? [Y/n]: "
+	read answer
+	answer=`echo ${answer,,}`
+	if [ "$answer" == "n" ]; then
+		echo -n "Please enter the host's domain name: "
+		read answer
+		HOST_DOMAIN="`echo ${answer,,}`"
+	fi
+
+	echo -n "The short hostname is \"$HOST_NAME\". Is this correct? [Y/n]: "
+	read answer
+	answer=`echo ${answer,,}`
+	if [ "$answer" == "n" ]; then
+		echo -n "Please enter the short host name: "
+		read answer
+		HOST_NAME="`echo ${answer,,}`"
+	fi
+}
+
 function check_hostname() {
 	require_reboot=0
 
@@ -27,7 +47,7 @@ function check_hostname() {
 	ping -c 3 $HOST_NAME &> /dev/null
 	if [ $? -ne 0 ]; then
 		echo "Adding a /etc/hosts record for $HOST_NAME"
-		echo -e "127.0.1.1\t$HOST_NAME" >> /etc/hosts
+		echo -e "127.0.1.1\t${HOST_NAME}.${HOST_DOMAIN} ${HOST_NAME}" >> /etc/hosts
 		require_reboot=1
 		ping -c 3 $HOST_NAME &> /dev/null
 		if [ $? -ne 0 ]; then
@@ -36,10 +56,10 @@ function check_hostname() {
 		fi
 	fi
 
-	if [ "`hostname`" != "$HOST_NAME" ]; then
+	if [ "`hostname -f`" != "${HOST_NAME}.${HOST_DOMAIN}" ]; then
 		echo "Setting the hostname of the machine to $HOST_NAME"
-		echo $HOST_NAME > /etc/hostname
-		hostname $HOST_NAME
+		echo "${HOST_NAME}.${HOST_DOMAIN}" > /etc/hostname
+		hostname "${HOST_NAME}.${HOST_DOMAIN}"
 		require_reboot=1
 	fi
 
@@ -76,6 +96,8 @@ function check_master_connection() {
 
 function install_dependencies() {
 	if [ "$OS_FAMILY" == "Ubuntu" ] || [ "$OS_FAMILY" == "Debian" ]; then
+		echo "Updating apt sources"
+		apt-get update > /dev/null
 		echo "Installing python-software-properties"
 		apt-get -y --force-yes install python-software-properties > /dev/null
 		if [ ${?} -ne 0 ]; then
@@ -190,6 +212,7 @@ function install_puppetagent() {
 	echo "eth0 will need to be restarted."
 }
 
+verify_hostname
 check_hostname
 check_master_connection
 install_dependencies

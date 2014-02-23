@@ -27,7 +27,8 @@ define lieutdan13::wordpress::plugin (
             puppi::netinstall { "wp-plugin ${name}":
                 url             => $real_source_url,
                 destination_dir => $real_destination_dir,
-                extracted_dir   => $real_extracted_dir
+                extracted_dir   => $real_extracted_dir,
+                require         => Class['::wordpress'],
             }
         }
 

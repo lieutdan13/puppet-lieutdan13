@@ -43,10 +43,4 @@ define lieutdan13::wordpress::plugin (
 
         default: { }
     }
-
-#    notify { "wp-plugin ${name} \$real_source_url": message => $real_source_url, loglevel => debug, }
-#    notify { "wp-plugin ${name} \$ensure": message => $ensure, loglevel => debug, }
-#    notify { "wp-plugin ${name} \$version": message => $version, loglevel => debug, }
-#    notify { "wp-plugin ${name} \$real_destination_dir": message => $real_destination_dir, loglevel => debug, }
-#    notify { "wp-plugin ${name} \$real_extracted_dir": message => $real_extracted_dir, loglevel => debug, }
 }

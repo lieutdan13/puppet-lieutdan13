@@ -36,8 +36,8 @@ class lieutdan13::wordpress::backup {
     if $backup_enabled == true {
         file { 'wordpress database backup directory':
             ensure => directory,
+            owner  => $backup_user,
             path   => $database_backup_dir,
-            user   => $backup_user,
         }
     }
 

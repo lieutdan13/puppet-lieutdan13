@@ -33,8 +33,8 @@ class lieutdan13::wordpress::backup {
     }
 
     #Don't remove the directory if backup is not enabled, in case the directory is shared by other backups
-    if $backup_enabled == true {
-        file { 'wordpress database backup directory':
+    if $backup_enabled == true and !defined(File[$database_backup_dir]) {
+        file { $database_backup_dir:
             ensure => directory,
             owner  => $backup_user,
             path   => $database_backup_dir,

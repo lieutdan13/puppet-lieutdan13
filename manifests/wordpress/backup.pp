@@ -7,6 +7,13 @@ class lieutdan13::wordpress::backup {
         true    => true,
         default => false,
     }
+    $database_cron_ensure   = $backup_enabled ? {
+        true    => $::wordpress::db_type ? {
+            /^(mysql|remote_mysql)$/ => 'present',
+            default => 'absent',
+        },
+        default => 'absent',
+    }
 
     $database_backup_dir = $backup_options['backup_dir'] ? {
         ''      => $::mysql_backup_dir ? {
@@ -43,12 +50,10 @@ class lieutdan13::wordpress::backup {
 
     cron { 'wordpress backup database':
         command => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql",
-        ensure  => $backup_enabled ? {
-            true    => 'present',
-            default => 'absent',
-        },
+        ensure  => $database_cron_ensure,
         hour    => $backup_hour,
         minute  => $backup_minute,
+        require => Class['::wordpress'],
         user    => $backup_user,
     }
 }

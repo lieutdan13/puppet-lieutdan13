@@ -38,6 +38,10 @@ class lieutdan13::wordpress(
             default => $install_source,
         }
 
+        if $options['backup'] == undef {
+            $options['backup'] = {}
+        }
+
         if $options['main_site'] == undef {
             $options['main_site'] = $::fqdn
         }

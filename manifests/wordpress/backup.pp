@@ -2,32 +2,32 @@
 class lieutdan13::wordpress::backup {
     include lieutdan13::params
 
-    $backup_options = $::wordpress::options::backup
-    $backup_enabled = $backup_options::enabled ? {
+    $backup_options = $::wordpress::options['backup']
+    $backup_enabled = $backup_options['enabled'] ? {
         true    => true,
         default => false,
     }
 
-    $database_backup_dir = $backup_options::backup_dir ? {
+    $database_backup_dir = $backup_options['backup_dir'] ? {
         ''      => $::mysql_backup_dir ? {
             ''      => $lieutdan13::params::mysql_backup_dir,
             default => $::mysql_backup_dir,
         },
-        default => $backup_options::backup_dir,
+        default => $backup_options['backup_dir'],
     }
-    $backup_user = $backup_options::user ? {
+    $backup_user = $backup_options['user'] ? {
         ''      => 'root',
-        default => $backup_options::user,
+        default => $backup_options['user'],
     }
-    $backup_hour = $backup_options::cron_hour ? {
+    $backup_hour = $backup_options['cron_hour'] ? {
         ''      => 0,
-        default => $backup_options::cron_hour,
+        default => $backup_options['cron_hour'],
     }
-    $backup_minute = $backup_options::cron_minute ? {
+    $backup_minute = $backup_options['cron_minute'] ? {
         ''      => 5,
-        default => $backup_options::cron_minute,
+        default => $backup_options['cron_minute'],
     }
-    $backup_db_date = $backup_options::cron_dated ? {
+    $backup_db_date = $backup_options['cron_dated'] ? {
         true    => "-`date +\%Y\%d\%m`",
         default => '',
     }

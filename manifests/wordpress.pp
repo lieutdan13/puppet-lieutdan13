@@ -16,6 +16,8 @@ class lieutdan13::wordpress(
     $multisite   = false,
     $multidb     = false,
     $options     = {},
+    $remote_password = '',
+    $remote_user = '',
     $version     = 'latest',
     $install_source = '',
 ) {
@@ -110,6 +112,23 @@ class lieutdan13::wordpress(
             template        => 'lieutdan13/wordpress/wp-config.php.erb',
             web_server      => '',
             web_virtualhost => '',
+        }
+
+        if $db_type == 'remote_mysql' {
+            if $remote_user == '' or $remote_password == '' {
+                notify { "You must define a \$remote_user and a \$remote_password to use the \"remote_mysql\" feature in lieutdan13::wordpress": loglevel => err }
+            } else {
+                mysql::grant { "wordpress_server_grants_${::fqdn}_${db_name}":
+                    mysql_db         => $db_name,
+                    mysql_user       => $db_user,
+                    mysql_password   => $db_password,
+                    mysql_privileges => 'ALL',
+                    mysql_host       => $fqdn,
+                    remote_host      => $db_host,
+                    remote_password  => $remote_password,
+                    remote_user      => $remote_user,
+                }
+            }
         }
     }
 }

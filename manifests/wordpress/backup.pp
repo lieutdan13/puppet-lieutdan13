@@ -51,7 +51,7 @@ class lieutdan13::wordpress::backup {
             path   => $database_backup_dir,
         }
     }
-
+    #TODO cleanup after X days (14 default)
     cron { 'wordpress backup database':
         command => $cron_command,
         ensure  => $database_cron_ensure,
@@ -60,4 +60,6 @@ class lieutdan13::wordpress::backup {
         require => Class['::wordpress'],
         user    => $backup_user,
     }
+    #TODO Add bacula FileSet in another lieutdan13 class
+    #TODO Add bacula Job here
 }

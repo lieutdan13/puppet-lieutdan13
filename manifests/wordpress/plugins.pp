@@ -14,4 +14,13 @@ class lieutdan13::wordpress::plugins {
             default          => $plugin_options['google-analytics-for-wordpress'],
         },
     }
+
+    lieutdan13::wordpress::plugin { 'resume-page':
+        ensure  => $plugin_options['resume-page'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        source_url => 'http://downloads.wordpress.org/plugin/resume-page.zip', #This plugin doesn't have versions (yet)
+    }
 }

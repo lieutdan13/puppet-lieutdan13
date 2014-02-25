@@ -35,7 +35,7 @@ class lieutdan13::wordpress::backup {
         default => $backup_options['cron_minute'],
     }
     $backup_db_date = $backup_options['cron_dated'] ? {
-        true    => ".`date +\\%Y\\%d\\%m`",
+        true    => ".`date +\\%Y\\%m\\%d`",
         default => '',
     }
     $backup_db_cleanup_days = $backup_options['cron_dated'] ? {

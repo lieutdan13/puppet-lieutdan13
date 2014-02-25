@@ -38,6 +38,13 @@ class lieutdan13::wordpress::backup {
         true    => ".`date +\\%Y\\%d\\%m`",
         default => '',
     }
+    $backup_db_cleanup_days = $backup_options['cron_dated'] ? {
+        true    => $backup_options['cleanup_days'] ? {
+            ''      => 14,
+            default => $backup_options['cleanup_days'],
+        },
+        default => 0,
+    }
     $cron_command = $backup_options['compress'] ? {
         true    => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} --compact ${::wordpress::db_name} | gzip -c > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql.gz",
         default => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql",
@@ -51,7 +58,7 @@ class lieutdan13::wordpress::backup {
             path   => $database_backup_dir,
         }
     }
-    #TODO cleanup after X days (14 default)
+    #TODO cleanup after X days (use \$backup_db_cleanup_days)
     cron { 'wordpress backup database':
         command => $cron_command,
         ensure  => $database_cron_ensure,

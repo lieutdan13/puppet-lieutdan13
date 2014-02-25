@@ -38,6 +38,10 @@ class lieutdan13::wordpress::backup {
         true    => "-`date +\%Y\%d\%m`",
         default => '',
     }
+    $cron_command = $backup_options['compress'] ? {
+        true    => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} --compact ${::wordpress::db_name} | gzip -c > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql.gz",
+        default => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql",
+    }
 
     #Don't remove the directory if backup is not enabled, in case the directory is shared by other backups
     if $backup_enabled == true and !defined(File[$database_backup_dir]) {
@@ -49,7 +53,7 @@ class lieutdan13::wordpress::backup {
     }
 
     cron { 'wordpress backup database':
-        command => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql",
+        command => $cron_command,
         ensure  => $database_cron_ensure,
         hour    => $backup_hour,
         minute  => $backup_minute,

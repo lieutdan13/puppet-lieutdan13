@@ -54,7 +54,8 @@ class lieutdan13::wordpress::backup {
         true    => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} --compact ${::wordpress::db_name} | gzip -c > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql.gz",
         default => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql",
     }
-    $cron_cleanup_command = "find ${database_backup_dir} -type f -regextype grep -type f -regex '.*/${::wordpress::db_name}\(\.[0-9]\{8\}\)\?\.sql\(\.gz\)\?' -mtime +${backup_db_cleanup_days} -print0 | xargs -0 --no-run-if-empty rm -f"
+    # Double escaped to prevent puppet errors
+    $cron_cleanup_command = "find ${database_backup_dir} -type f -regextype grep -type f -regex '.*/${::wordpress::db_name}\\(\\.[0-9]\\{8\\}\\)\\?\\.sql\\(\\.gz\\)\\?' -mtime +${backup_db_cleanup_days} -print0 | xargs -0 --no-run-if-empty rm -f"
 
     #Don't remove the directory if backup is not enabled, in case the directory is shared by other backups
     if $backup_enabled == true and !defined(File[$database_backup_dir]) {

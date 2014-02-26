@@ -130,7 +130,7 @@ class lieutdan13::wordpress::backup {
         user    => $backup_user,
     }
     if $bacula_enabled == true {
-        @@bacula::director::fileset { "Wordpress Files for ${bacula_client_name}":
+        @@bacula::director::fileset { "${bacula_client_name} Wordpress Files":
             signature    => 'SHA1',
             compression  => 'GZIP',
             onefs        => 'yes',
@@ -138,8 +138,9 @@ class lieutdan13::wordpress::backup {
                 "${database_backup_dir}/${::wordpress::db_name}",
                 "${::wordpress::real_data_dir}",
             ],
+            tag                 => "${::fqdn}",
         }
-        @@bacula::director::pool { "Wordpress for ${bacula_client_name} Full":
+        @@bacula::director::pool { "${bacula_client_name} Wordpress Full":
             type                => 'Backup',
             maximum_volume_jobs => '1',
             use_volume_once     => 'yes',
@@ -151,11 +152,11 @@ class lieutdan13::wordpress::backup {
             storage             => 'FullStorage',
             tag                 => "${::fqdn}",
         }
-        @@bacula::director::job { "Backup Wordpress for ${bacula_client_name}":
+        @@bacula::director::job { "Backup ${bacula_client_name} Wordpress Files":
             client       => $bacula_client_name,
             type         => 'Backup',
-            fileset      => "Wordpress Files for ${bacula_client_name}",
-            pool         => "Wordpress for ${bacula_client_name} Full",
+            fileset      => "${bacula_client_name} Wordpress Files",
+            pool         => "${bacula_client_name} Wordpress Full",
             job_schedule => 'Monthly',
             priority     => 5,
             messages     => 'Standard',

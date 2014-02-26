@@ -65,11 +65,20 @@ class lieutdan13::wordpress::backup {
     $cron_cleanup_command = "find ${database_backup_dir}/${::wordpress::db_name} -type f -regextype grep -type f -regex '.*/${::wordpress::db_name}\\(\\.[0-9]\\{8\\}\\)\\?\\.sql\\(\\.gz\\)\\?' -mtime +${backup_db_cleanup_days} -print0 | xargs -0 --no-run-if-empty rm -f"
 
     #Don't remove the directory if backup is not enabled, in case the directory is shared by other backups
-    if $backup_enabled == true and !defined(File[$database_backup_dir]) {
-        file { $database_backup_dir:
-            ensure => directory,
-            owner  => $backup_user,
-            path   => $database_backup_dir,
+    if $backup_enabled == true {
+        if !defined(File[$database_backup_dir]) {
+            file { $database_backup_dir:
+                ensure => directory,
+                owner  => $backup_user,
+                path   => $database_backup_dir,
+            }
+        }
+        file {
+            file { "${database_backup_dir}/${::wordpress::db_name}":
+                ensure => directory,
+                owner  => $backup_user,
+                path   => "${database_backup_dir}/${::wordpress::db_name}",
+            }
         }
     }
     cron { 'wordpress backup database':

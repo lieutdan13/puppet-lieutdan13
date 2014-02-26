@@ -7,6 +7,13 @@ class lieutdan13::wordpress::backup {
         true    => true,
         default => false,
     }
+    $bacula_enabled = $backup_enabled ? {
+        true    => $backup_options['bacula'] ? {
+            true    => true,
+            default => false,
+        },
+        default => false,
+    }
     $database_cron_ensure   = $backup_enabled ? {
         true    => $::wordpress::db_type ? {
             /^(mysql|remote_mysql)$/ => 'present',
@@ -51,11 +58,11 @@ class lieutdan13::wordpress::backup {
         $database_cron_cleanup_ensure = 'absent'
     }
     $cron_command = $backup_options['compress'] ? {
-        true    => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} --compact ${::wordpress::db_name} | gzip -c > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql.gz",
-        default => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}${backup_db_date}.sql",
+        true    => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} --compact ${::wordpress::db_name} | gzip -c > ${database_backup_dir}/${::wordpress::db_name}/${::wordpress::db_name}${backup_db_date}.sql.gz",
+        default => "mysqldump -h ${::wordpress::db_host} -u ${::wordpress::db_user} --password=${::wordpress::db_password} ${::wordpress::db_name} > ${database_backup_dir}/${::wordpress::db_name}/${::wordpress::db_name}${backup_db_date}.sql",
     }
     # Double escaped to prevent puppet errors
-    $cron_cleanup_command = "find ${database_backup_dir} -type f -regextype grep -type f -regex '.*/${::wordpress::db_name}\\(\\.[0-9]\\{8\\}\\)\\?\\.sql\\(\\.gz\\)\\?' -mtime +${backup_db_cleanup_days} -print0 | xargs -0 --no-run-if-empty rm -f"
+    $cron_cleanup_command = "find ${database_backup_dir}/${::wordpress::db_name} -type f -regextype grep -type f -regex '.*/${::wordpress::db_name}\\(\\.[0-9]\\{8\\}\\)\\?\\.sql\\(\\.gz\\)\\?' -mtime +${backup_db_cleanup_days} -print0 | xargs -0 --no-run-if-empty rm -f"
 
     #Don't remove the directory if backup is not enabled, in case the directory is shared by other backups
     if $backup_enabled == true and !defined(File[$database_backup_dir]) {
@@ -81,6 +88,40 @@ class lieutdan13::wordpress::backup {
         require => Class['::wordpress'],
         user    => $backup_user,
     }
-    #TODO Add bacula FileSet in another lieutdan13 class
-    #TODO Add bacula Job here
+    if $bacula_enabled == true {
+        @@bacula::director::fileset { "Wordpress Files for ${::pretty_hostname}":
+            signature    => 'SHA1',
+            compression  => 'GZIP',
+            onefs        => 'yes',
+            include      => [
+                "${database_backup_dir}/${::wordpress::db_name}",
+                "${::wordpress::real_data_dir}",
+            ],
+        }
+        @@bacula::director::pool { "Wordpress for ${::pretty_hostname} Full":
+            type                => 'Backup',
+            maximum_volume_jobs => '1',
+            use_volume_once     => 'yes',
+            recycle             => 'no',
+            action_on_purge     => 'Truncate',
+            auto_prune          => 'yes',
+            volume_retention    => '1 month',
+            label_format        => 'Full_${Year}-${Month:p/2/0/r}-${Day:p/2/0/r}_Wordpress_for_${::pretty_hostname}',
+            storage             => 'FullStorage',
+            tag                 => "${::fqdn}",
+        }
+        @@bacula::director::job { "Backup Wordpress for ${::pretty_hostname}":
+            client       => $::pretty_hostname,
+            type         => 'Backup',
+            fileset      => "Wordpress Files for ${::pretty_hostname}",
+            pool         => "Wordpress for ${::pretty_hostname} Full",
+            job_schedule => 'Monthly',
+            priority     => 5,
+            messages     => 'Standard',
+            jobdef       => 'Default JobDefs',
+            template     => 'bacula/director/job.conf.erb',
+            require      => Bacula::Director::Client[$::pretty_hostname],
+            tag          => "${::fqdn}",
+        }
+    }
 }

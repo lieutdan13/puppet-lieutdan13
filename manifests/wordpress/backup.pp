@@ -5,26 +5,28 @@
 # templates. This class uses the $options['backup'] element in the hash. Here are the supported
 # sub-keys.
 #
-# options['backup']['enabled']          : (boolena) Enable or disable backup (Default: false)
-# options['backup']['bacula']           : (boolean) Enable or disable backup using bacula
-#                                         (Default: false)
-# options['backup']['backup_dir']       : (string)  Directory to use to dump the MySql database
-#                                         (Default: $::mysql_backup_dir global variable or
-#                                         $lieutdan13::params::mysql_backup_dir if not set)
-# options['backup']['user']             : (string)  User to run the MySql dump command using cron
-#                                         and to own the $backup_dir (Default: root)
-# options['backup']['cron_hour']        : (string)  Hour of the day to run the MySql dump
-#                                         (Default: 0)
-# options['backup']['cron_minute']      : (string)  Minute of the hour to run the MySql dump
-#                                         (Default: 5)
-# options['backup']['cron_dated']       : (boolean) Whether to include a date in the MySql dump file
-#                                         (Default: '')
-# options['backup']['cleanup_days']     : (integer) How many MySql files to keep. If you use this
-#                                         feature, you must also enable cron_dated. Otherwise, the
-#                                         MySql dumps will be removed shortly after they are created.
-#                                         (Default: 14)
-# options['backup']['compress']         : (boolean) Whether to compress the MySql dump into a
-#                                         .sql.gz file instead of .sql (Default: false)
+# options['backup']['enabled']              : (boolean) Enable or disable backup (Default: false)
+# options['backup']['bacula']               : (boolean) Enable or disable backup using bacula
+#                                             (Default: false)
+# options['backup']['bacula_client_name']   : (string) The name of the Bacula Client to use.
+#                                             (Default: $::fqdn)
+# options['backup']['backup_dir']           : (string)  Directory to use to dump the MySql database
+#                                             (Default: $::mysql_backup_dir global variable or
+#                                             $lieutdan13::params::mysql_backup_dir if not set)
+# options['backup']['user']                 : (string)  User to run the MySql dump command using cron
+#                                             and to own the $backup_dir (Default: root)
+# options['backup']['cron_hour']            : (string)  Hour of the day to run the MySql dump
+#                                             (Default: 0)
+# options['backup']['cron_minute']          : (string)  Minute of the hour to run the MySql dump
+#                                             (Default: 5)
+# options['backup']['cron_dated']           : (boolean) Whether to include a date in the MySql dump file
+#                                             (Default: '')
+# options['backup']['cleanup_days']         : (integer) How many MySql files to keep. If you use this
+#                                             feature, you must also enable cron_dated. Otherwise, the
+#                                             MySql dumps will be removed shortly after they are created.
+#                                             (Default: 14)
+# options['backup']['compress']             : (boolean) Whether to compress the MySql dump into a
+#                                             .sql.gz file instead of .sql (Default: false)
 #
 ####################################################################################################
 class lieutdan13::wordpress::backup {
@@ -80,6 +82,10 @@ class lieutdan13::wordpress::backup {
         },
         default => 0,
     }
+    $bacula_client_name = $backup_options['bacula_client_name'] ? {
+        ''      => $::fqdn,
+        default => $backup_options['bacula_client_name'],
+    }
     if $database_cron_ensure == 'present' and $backup_db_cleanup_days > 0 {
         $database_cron_cleanup_ensure = 'present'
     } else {
@@ -124,7 +130,7 @@ class lieutdan13::wordpress::backup {
         user    => $backup_user,
     }
     if $bacula_enabled == true {
-        @@bacula::director::fileset { "Wordpress Files for ${::pretty_hostname}":
+        @@bacula::director::fileset { "Wordpress Files for ${bacula_client_name}":
             signature    => 'SHA1',
             compression  => 'GZIP',
             onefs        => 'yes',
@@ -133,7 +139,7 @@ class lieutdan13::wordpress::backup {
                 "${::wordpress::real_data_dir}",
             ],
         }
-        @@bacula::director::pool { "Wordpress for ${::pretty_hostname} Full":
+        @@bacula::director::pool { "Wordpress for ${bacula_client_name} Full":
             type                => 'Backup',
             maximum_volume_jobs => '1',
             use_volume_once     => 'yes',
@@ -141,21 +147,21 @@ class lieutdan13::wordpress::backup {
             action_on_purge     => 'Truncate',
             auto_prune          => 'yes',
             volume_retention    => '1 month',
-            label_format        => 'Full_${Year}-${Month:p/2/0/r}-${Day:p/2/0/r}_Wordpress_for_${::pretty_hostname}',
+            label_format        => 'Full_${Year}-${Month:p/2/0/r}-${Day:p/2/0/r}_Wordpress_for_${bacula_client_name}',
             storage             => 'FullStorage',
             tag                 => "${::fqdn}",
         }
-        @@bacula::director::job { "Backup Wordpress for ${::pretty_hostname}":
-            client       => $::pretty_hostname,
+        @@bacula::director::job { "Backup Wordpress for ${bacula_client_name}":
+            client       => $bacula_client_name,
             type         => 'Backup',
-            fileset      => "Wordpress Files for ${::pretty_hostname}",
-            pool         => "Wordpress for ${::pretty_hostname} Full",
+            fileset      => "Wordpress Files for ${bacula_client_name}",
+            pool         => "Wordpress for ${bacula_client_name} Full",
             job_schedule => 'Monthly',
             priority     => 5,
             messages     => 'Standard',
             jobdef       => 'Default JobDefs',
             template     => 'bacula/director/job.conf.erb',
-            require      => Bacula::Director::Client[$::pretty_hostname],
+            require      => Bacula::Director::Client[$bacula_client_name],
             tag          => "${::fqdn}",
         }
     }

@@ -1,4 +1,32 @@
+####################################################################################################
 # Class lieutdan13::wordpress::backup
+#
+# The Wordpress Class supports an $options parameter that can be used in included classes and
+# templates. This class uses the $options['backup'] element in the hash. Here are the supported
+# sub-keys.
+#
+# options['backup']['enabled']          : (boolena) Enable or disable backup (Default: false)
+# options['backup']['bacula']           : (boolean) Enable or disable backup using bacula
+#                                         (Default: false)
+# options['backup']['backup_dir']       : (string)  Directory to use to dump the MySql database
+#                                         (Default: $::mysql_backup_dir global variable or
+#                                         $lieutdan13::params::mysql_backup_dir if not set)
+# options['backup']['user']             : (string)  User to run the MySql dump command using cron
+#                                         and to own the $backup_dir (Default: root)
+# options['backup']['cron_hour']        : (string)  Hour of the day to run the MySql dump
+#                                         (Default: 0)
+# options['backup']['cron_minute']      : (string)  Minute of the hour to run the MySql dump
+#                                         (Default: 5)
+# options['backup']['cron_dated']       : (boolean) Whether to include a date in the MySql dump file
+#                                         (Default: '')
+# options['backup']['cleanup_days']     : (integer) How many MySql files to keep. If you use this
+#                                         feature, you must also enable cron_dated. Otherwise, the
+#                                         MySql dumps will be removed shortly after they are created.
+#                                         (Default: 14)
+# options['backup']['compress']         : (boolean) Whether to compress the MySql dump into a
+#                                         .sql.gz file instead of .sql (Default: false)
+#
+####################################################################################################
 class lieutdan13::wordpress::backup {
     include lieutdan13::params
 

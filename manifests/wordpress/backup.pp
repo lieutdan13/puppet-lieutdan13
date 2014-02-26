@@ -73,12 +73,10 @@ class lieutdan13::wordpress::backup {
                 path   => $database_backup_dir,
             }
         }
-        file {
-            file { "${database_backup_dir}/${::wordpress::db_name}":
-                ensure => directory,
-                owner  => $backup_user,
-                path   => "${database_backup_dir}/${::wordpress::db_name}",
-            }
+        file { "${database_backup_dir}/${::wordpress::db_name}":
+            ensure => directory,
+            owner  => $backup_user,
+            path   => "${database_backup_dir}/${::wordpress::db_name}",
         }
     }
     cron { 'wordpress backup database':

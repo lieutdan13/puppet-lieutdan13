@@ -157,7 +157,7 @@ class lieutdan13::wordpress::backup {
             type         => 'Backup',
             fileset      => "${bacula_client_name} Wordpress Files",
             pool         => "${bacula_client_name} Wordpress Full",
-            job_schedule => 'Monthly',
+            job_schedule => 'Daily',
             priority     => 5,
             messages     => 'Standard',
             jobdef       => 'Default JobDefs',

@@ -162,7 +162,7 @@ class lieutdan13::wordpress::backup {
             messages     => 'Standard',
             jobdef       => 'Default JobDefs',
             template     => 'bacula/director/job.conf.erb',
-            require      => Bacula::Director::Client[$bacula_client_name],
+            require      => [Bacula::Director::Client[$bacula_client_name],Bacula::Director::Schedule['Daily']],
             tag          => "${::fqdn}",
         }
     }

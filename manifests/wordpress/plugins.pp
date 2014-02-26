@@ -35,4 +35,16 @@ class lieutdan13::wordpress::plugins {
         },
         source_url => 'http://downloads.wordpress.org/plugin/resume-page.zip', #This plugin doesn't have versions (yet)
     }
+
+    lieutdan13::wordpress::plugin { 'wordpress-importer':
+        ensure  => $plugin_options['wordpress-importer'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $plugin_options['wordpress-importer'] ? {
+            /(true|latest)/  => '0.6.1', #TODO Put this in a params class
+            default          => $plugin_options['wordpress-importer'],
+        },
+    }
 }

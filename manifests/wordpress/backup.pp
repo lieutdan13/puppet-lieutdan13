@@ -148,7 +148,7 @@ class lieutdan13::wordpress::backup {
             action_on_purge     => 'Truncate',
             auto_prune          => 'yes',
             volume_retention    => '1 month',
-            label_format        => 'Full_${Year}-${Month:p/2/0/r}-${Day:p/2/0/r}_Wordpress_for_${bacula_client_name}',
+            label_format        => "Full_\${Year}-\${Month:p/2/0/r}-\${Day:p/2/0/r}_Wordpress_for_${bacula_client_name}",
             storage             => 'FullStorage',
             tag                 => "${::fqdn}",
         }

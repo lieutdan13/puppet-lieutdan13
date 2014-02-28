@@ -2,6 +2,7 @@
 class lieutdan13::wordpress::extras {
 
     include lieutdan13::wordpress::plugins
+    include lieutdan13::wordpress::themes
     include lieutdan13::wordpress::backup
 
     #htaccess

@@ -50,6 +50,10 @@ class lieutdan13::wordpress(
             $options['plugins'] = {}
         }
 
+        if $options['themes'] == undef {
+            $options['themes'] = {}
+        }
+
         if $multisite == false {
             $options['WP_ALLOW_MULTISITE'] = false
             $options['MULTISITE'] = false

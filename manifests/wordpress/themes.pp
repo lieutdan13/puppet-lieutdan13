@@ -10,6 +10,7 @@ class lieutdan13::wordpress::themes {
         },
         version =>  $theme_options['twentytwelve'] ? {
             /(true|latest)/  => '1.3', #TODO Put this in a params class
+            undef            => '1.3', #TODO Put this in a params class
             default          => $theme_options['twentytwelve'],
         },
     }

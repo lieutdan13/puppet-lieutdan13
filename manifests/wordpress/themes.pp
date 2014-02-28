@@ -6,8 +6,7 @@ class lieutdan13::wordpress::themes {
     lieutdan13::wordpress::theme { 'twentytwelve':
         ensure  => $theme_options['twentytwelve'] ? {
             /(false|absent)/ => absent,
-            ''               => absent,
-            default          => present,
+            default          => present, #If left blank, enable it
         },
         version =>  $theme_options['twentytwelve'] ? {
             /(true|latest)/  => '1.3', #TODO Put this in a params class

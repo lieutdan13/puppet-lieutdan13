@@ -27,6 +27,18 @@ class lieutdan13::wordpress::plugins {
         },
     }
 
+    lieutdan13::wordpress::plugin { 'jetpack':
+        ensure  => $plugin_options['jetpack'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $plugin_options['jetpack'] ? {
+            /(true|latest)/  => '2.9', #TODO Put this in a params class
+            default          => $plugin_options['jetpack'],
+        },
+    }
+
     lieutdan13::wordpress::plugin { 'resume-page':
         ensure  => $plugin_options['resume-page'] ? {
             /(false|absent)/ => absent,
@@ -53,15 +65,6 @@ class lieutdan13::wordpress::plugins {
     }
 
     lieutdan13::wordpress::plugin { 'wp-google-maps':
-        ensure  => $plugin_options['wp-google-maps'] ? {
-            /(false|absent)/ => absent,
-            ''               => absent,
-            default          => present,
-        },
-        version =>  $plugin_options['wp-google-maps'] ? {
-            true             => '', #TODO Put this in a params class
-            /(true|latest)/  => '', #TODO Put this in a params class
-            default          => $plugin_options['wp-google-maps'],
-        },
+        ensure  => 'absent',
     }
 }

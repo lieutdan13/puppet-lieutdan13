@@ -17,8 +17,13 @@ define lieutdan13::wordpress::plugin (
         default => $extracted_dir,
     }
 
+    $version_append = $version ? {
+        ''      => '',
+        default => ".${version}",
+    }
+
     $real_source_url = $source_url ? {
-        ''      => "${plugins_url}/${name}.${version}.zip",
+        ''      => "${plugins_url}/${name}${version_append}.zip",
         default => $source_url,
     }
 

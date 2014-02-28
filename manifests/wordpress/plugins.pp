@@ -33,7 +33,11 @@ class lieutdan13::wordpress::plugins {
             ''               => absent,
             default          => present,
         },
-        source_url => 'http://downloads.wordpress.org/plugin/resume-page.zip', #This plugin doesn't have versions (yet)
+        version =>  $plugin_options['resume-page'] ? {
+            true             => '', #TODO Put this in a params class
+            /(true|latest)/  => '', #TODO Put this in a params class
+            default          => $plugin_options['resume-page'],
+        },
     }
 
     lieutdan13::wordpress::plugin { 'wordpress-importer':
@@ -45,6 +49,19 @@ class lieutdan13::wordpress::plugins {
         version =>  $plugin_options['wordpress-importer'] ? {
             /(true|latest)/  => '0.6.1', #TODO Put this in a params class
             default          => $plugin_options['wordpress-importer'],
+        },
+    }
+
+    lieutdan13::wordpress::plugin { 'wp-google-maps':
+        ensure  => $plugin_options['wp-google-maps'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $plugin_options['wp-google-maps'] ? {
+            true             => '', #TODO Put this in a params class
+            /(true|latest)/  => '', #TODO Put this in a params class
+            default          => $plugin_options['wp-google-maps'],
         },
     }
 }

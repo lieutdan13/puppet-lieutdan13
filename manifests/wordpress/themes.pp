@@ -14,4 +14,16 @@ class lieutdan13::wordpress::themes {
             default          => $theme_options['twentytwelve'],
         },
     }
+
+    lieutdan13::wordpress::theme { 'something-fishy':
+        ensure  => $theme_options['something-fishy'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $theme_options['something-fishy'] ? {
+            /(true|latest)/  => '1.10', #TODO Put this in a params class
+            default          => $theme_options['something-fishy'],
+        },
+    }
 }

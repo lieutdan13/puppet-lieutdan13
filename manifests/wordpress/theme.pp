@@ -37,7 +37,7 @@ define lieutdan13::wordpress::theme (
                 $source_filename = url_parse($source_file, 'filename')
                 file { "wp-theme ${name} archive":
                     path   => "/var/tmp/${source_filename}",
-                    source => $source_file,
+                    source => "puppet:///${source_file}",
                 }
                 $retrieve_command = "test"
                 $theme_require = [Class['::wordpress'],File["wp-theme ${name} archive"]]

@@ -4,6 +4,7 @@ define lieutdan13::wordpress::theme (
     $extracted_dir   = '',
     $ensure          = 'present',
     $themes_url      = 'http://wordpress.org/themes/download',
+    $source_file     = '',
     $source_url      = '',
     $version         = ''
 ) {
@@ -22,18 +23,34 @@ define lieutdan13::wordpress::theme (
         default => ".${version}",
     }
 
-    $real_source_url = $source_url ? {
-        ''      => "${themes_url}/${name}${version_append}.zip",
-        default => $source_url,
+    $real_source_url = $source_file ? {
+        ''      => $source_url ? {
+            ''      => "${themes_url}/${name}${version_append}.zip",
+            default => $source_url,
+        },
+        default => $source_file,
     }
 
     case $ensure {
         'present': {
+            if ($source_file != '') {
+                $source_filename = url_parse($source_file, 'filename')
+                file { "wp-theme ${name} archive":
+                    path   => "/var/tmp/${source_filename}",
+                    source => $source_file,
+                }
+                $retrieve_command = "test"
+                $theme_require = [Class['::wordpress'],File["wp-theme ${name} archive"]]
+            } else {
+                $retrieve_command = undef
+                $theme_require = Class['::wordpress']
+            }
             puppi::netinstall { "wp-theme ${name}":
                 url             => $real_source_url,
                 destination_dir => $real_destination_dir,
                 extracted_dir   => $real_extracted_dir,
-                require         => Class['::wordpress'],
+                retrieve_command => $retrieve_command,
+                require         => $theme_require,
             }
         }
 

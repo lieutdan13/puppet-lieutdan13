@@ -55,7 +55,7 @@ class lieutdan13::wordpress::plugins {
     if ($lightbox_gallery_ensure == 'present') {
          puppi::netinstall { 'lightbox-gallery jquery.lightbox.js':
             url             => 'http://wpgogo.com/jquery.lightbox.js',
-            destination_dir => "${::wordpress::real_data_dir}/wp-content/plugins/lightbox-gallery",
+            destination_dir => "${::wordpress::real_data_dir}/wp-content/plugins/lightbox-gallery/js",
             extract_command => 'cp',
             require         => Lieutdan13::Wordpress::Plugin['lightbox-gallery'],
         }

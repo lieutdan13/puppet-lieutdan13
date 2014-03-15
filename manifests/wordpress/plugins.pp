@@ -45,7 +45,7 @@ class lieutdan13::wordpress::plugins {
         default          => present,
     }
     lieutdan13::wordpress::plugin { 'lightbox-gallery':
-        ensure  => $lightbox_gallery_ensure
+        ensure  => $lightbox_gallery_ensure,
         version =>  $plugin_options['lightbox-gallery'] ? {
             /(true|latest)/  => '0.7.4', #TODO Put this in a params class
             default          => $plugin_options['lightbox-gallery'],

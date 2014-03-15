@@ -39,26 +39,16 @@ class lieutdan13::wordpress::plugins {
         },
     }
 
-    $lightbox_gallery_ensure = $plugin_options['lightbox-gallery'] ? {
-        /(false|absent)/ => absent,
-        ''               => absent,
-        default          => present,
-    }
-    lieutdan13::wordpress::plugin { 'lightbox-gallery':
-        ensure  => $lightbox_gallery_ensure,
-        version =>  $plugin_options['lightbox-gallery'] ? {
-            /(true|latest)/  => '0.7.4', #TODO Put this in a params class
-            default          => $plugin_options['lightbox-gallery'],
+    lieutdan13::wordpress::plugin { 'responsive-lightbox':
+        ensure  => $plugin_options['responsive-lightbox'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
         },
-    }
-
-    if ($lightbox_gallery_ensure == 'present') {
-         puppi::netinstall { 'lightbox-gallery jquery.lightbox.js':
-            url             => 'http://wpgogo.com/jquery.lightbox.js',
-            destination_dir => "${::wordpress::real_data_dir}/wp-content/plugins/lightbox-gallery/js",
-            extract_command => 'cp',
-            require         => Lieutdan13::Wordpress::Plugin['lightbox-gallery'],
-        }
+        version =>  $plugin_options['responsive-lightbox'] ? {
+            /(true|latest)/  => '1.3.6', #TODO Put this in a params class
+            default          => $plugin_options['responsive-lightbox'],
+        },
     }
 
     lieutdan13::wordpress::plugin { 'resume-page':

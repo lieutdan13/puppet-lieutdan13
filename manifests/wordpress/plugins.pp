@@ -39,6 +39,18 @@ class lieutdan13::wordpress::plugins {
         },
     }
 
+    lieutdan13::wordpress::plugin { 'lightbox-gallery':
+        ensure  => $plugin_options['lightbox-gallery'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $plugin_options['lightbox-gallery'] ? {
+            /(true|latest)/  => '0.7.4', #TODO Put this in a params class
+            default          => $plugin_options['lightbox-gallery'],
+        },
+    }
+
     lieutdan13::wordpress::plugin { 'resume-page':
         ensure  => $plugin_options['resume-page'] ? {
             /(false|absent)/ => absent,

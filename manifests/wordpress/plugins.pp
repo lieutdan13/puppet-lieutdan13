@@ -39,6 +39,18 @@ class lieutdan13::wordpress::plugins {
         },
     }
 
+    lieutdan13::wordpress::plugin { 'responsive-lightbox':
+        ensure  => $plugin_options['responsive-lightbox'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $plugin_options['responsive-lightbox'] ? {
+            /(true|latest)/  => '1.3.6', #TODO Put this in a params class
+            default          => $plugin_options['responsive-lightbox'],
+        },
+    }
+
     lieutdan13::wordpress::plugin { 'resume-page':
         ensure  => $plugin_options['resume-page'] ? {
             /(false|absent)/ => absent,

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+FILE_REBOOT=/var/run/reboot-required
+FILE_PKGS=/var/run/reboot-required.pkgs
+DAYS_CRIT=$1
+
+if [ "$DAYS_CRIT" == "" ]; then
+    DAYS_CRIT=10
+fi
+
+OK=0
+WARN=1
+CRIT=2
+RETVAL=0
+MSG=""
+
+if [ ! -f $FILE_REBOOT ]; then
+    RETVAL=$OK
+    MSG="REBOOT OK: System does not need rebooted"
+else
+    NOW=`date +%s`;
+    DATE_REBOOT=`stat -c %Z $FILE_REBOOT`
+    DATE_PKGS=`stat -c %Z $FILE_PKGS`
+    (( DAYS_OLD_REBOOT= (NOW - DATE_REBOOT)/60/60/24 ));
+    (( DAYS_OLD_PKGS= (NOW - DATE_PKGS)/60/60/24 ));
+    if [ $DAYS_OLD_REBOOT -ge $DAYS_CRIT ] || [ $DAYS_OLD_PKGS -ge $DAYS_CRIT ]; then
+        RETVAL=$CRIT
+        MSG="REBOOT CRITICAL:"
+    else
+        RETVAL=$WARN
+        MSG="REBOOT WARNING:"
+    fi
+    MSG="${MSG} System has needed to reboot for"
+    if [ $DAYS_OLD_REBOOT -gt $DAYS_OLD_PKGS ]; then
+        MSG="${MSG} ${DAYS_OLD_REBOOT} days"
+    else
+        MSG="${MSG} ${DAYS_OLD_PKGS} days"
+    fi
+    MSG="${MSG}: `cat $FILE_PKGS`"
+fi
+
+echo $MSG
+exit $RETVAL

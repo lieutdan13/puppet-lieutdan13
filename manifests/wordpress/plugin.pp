@@ -34,7 +34,7 @@ define lieutdan13::wordpress::plugin (
             if $version != '' and $version != 'latest' and $version_file and $version_regex and $real_destination_dir and $real_extracted_dir {
                 exec { "wp-plugin ${name} version check":
                     command => "/bin/true",
-                    unless  => "/bin/grep '${version_regex} ${version}' ${real_destination_dir}/${real_extracted_dir}/${version_file}",
+                    unless  => "/bin/grep '${version_regex} ${version}' ${real_destination_dir}/${real_extracted_dir}/${version_file} 2>/dev/null",
                     notify  => Exec["wp-plugin ${name} remove old version"],
                 }
 

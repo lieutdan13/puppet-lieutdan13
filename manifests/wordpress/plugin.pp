@@ -5,7 +5,9 @@ define lieutdan13::wordpress::plugin (
     $ensure          = 'present',
     $plugins_url     = 'http://downloads.wordpress.org/plugin',
     $source_url      = '',
-    $version         = ''
+    $version         = '',
+    $version_file    = 'readme.txt',
+    $version_regex   = 'Stable tag: '
 ) {
     $real_destination_dir = $destination_dir ? {
         ''      => "${::wordpress::real_data_dir}/wp-content/plugins",
@@ -29,6 +31,19 @@ define lieutdan13::wordpress::plugin (
 
     case $ensure {
         'present': {
+            if $version != '' and $version != 'latest' and $version_file and $version_regex and $real_destination_dir and $real_extracted_dir {
+                exec { "wp-plugin ${name} version check":
+                    command => "/bin/true",
+                    unless  => "/bin/grep '${version_regex} ${version}' ${real_destination_dir}/${real_extracted_dir}/${version_file}",
+                    notify  => Exec["wp-plugin ${name} remove old version"],
+                }
+
+                exec { "wp-plugin ${name} remove old version":
+                    command     => "/bin/rm -rf ${real_destination_dir}/${real_extracted_dir}",
+                    refreshonly => true,
+                    before      => Puppi::Netinstall["wp-plugin ${name}"],
+                }
+            }
             puppi::netinstall { "wp-plugin ${name}":
                 url             => $real_source_url,
                 destination_dir => $real_destination_dir,

@@ -76,6 +76,18 @@ class lieutdan13::wordpress::plugins {
         },
     }
 
+    lieutdan13::wordpress::plugin { 'wordpress-seo':
+        ensure  => $plugin_options['wordpress-seo'] ? {
+            /(false|absent)/ => absent,
+            ''               => absent,
+            default          => present,
+        },
+        version =>  $plugin_options['wordpress-seo'] ? {
+            /(true|latest)/  => '1.5.2.8', #TODO Put this in a params class
+            default          => $plugin_options['wordpress-seo'],
+        },
+    }
+
     lieutdan13::wordpress::plugin { 'wp-google-maps':
         ensure  => 'absent',
     }

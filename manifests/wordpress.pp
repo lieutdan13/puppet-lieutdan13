@@ -46,17 +46,24 @@ class lieutdan13::wordpress(
         }
 
         if $multisite == false {
-            $multi_site['WP_ALLOW_MULTISITE'] = false
-            $multi_site['MULTISITE'] = false
+            $multi_site = {
+                'WP_ALLOW_MULTISITE' => false,
+                'MULTISITE'          => false,
+            }
         } elsif $multisite == 'allow' {
-            $multi_site['WP_ALLOW_MULTISITE'] = true
-            $multi_site['MULTISITE'] = false
+            $multi_site = {
+                'WP_ALLOW_MULTISITE' => true,
+                'MULTISITE'          => false,
+            }
         } else {
-            $multi_site['WP_ALLOW_MULTISITE'] = true
-            $multi_site['MULTISITE'] = true
-            $multi_site['multidb'] = $multidb
+            $_multi_site = {
+                'WP_ALLOW_MULTISITE' => true,
+                'MULTISITE'          => false,
+                'multidb'            => $multidb,
+            }
 
             if $multi_site['multidb'] {
+                $multi_db = {}
                 if $options['shardb_prefix'] == undef {
                     $options['shardb_prefix'] = 'wordpress_mu'
                 }
@@ -87,7 +94,11 @@ class lieutdan13::wordpress(
                         mysql_host       => $db_host,
                     }
                 }
+            } else {
+                $multi_db = {}
             }
+
+            $multi_site = merge($_multi_site, $multi_db)
         }
 
         #Merge the options

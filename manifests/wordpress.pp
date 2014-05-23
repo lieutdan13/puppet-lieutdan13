@@ -24,7 +24,6 @@ class lieutdan13::wordpress(
 ) {
 
     include lieutdan13::essentials
-    $empty_hash = {}
 
     if $db_password == '' {
         notify { "You must define a \$db_password for lieutdan13::wordpress": loglevel => err }
@@ -39,35 +38,25 @@ class lieutdan13::wordpress(
             default => $install_source,
         }
 
-        if $options['backup'] == undef {
-            $options['backup'] = {}
-        }
-
-        if $options['main_site'] == undef {
-            $options['main_site'] = $::fqdn
-        }
-
-        if $options['plugins'] == undef {
-            $options['plugins'] = {}
-        }
-
-        $themes['themes'] = $options['themes'] ? {
-            undef   => $empty_hash,
-            default => $options['themes'],
+        $default_options = {
+            'backup'    => {},
+            'main_site' => $::fqdn,
+            'plugins'   => {},
+            'themes'    => {},
         }
 
         if $multisite == false {
-            $options['WP_ALLOW_MULTISITE'] = false
-            $options['MULTISITE'] = false
+            $multi_site['WP_ALLOW_MULTISITE'] = false
+            $multi_site['MULTISITE'] = false
         } elsif $multisite == 'allow' {
-            $options['WP_ALLOW_MULTISITE'] = true
-            $options['MULTISITE'] = false
+            $multi_site['WP_ALLOW_MULTISITE'] = true
+            $multi_site['MULTISITE'] = false
         } else {
-            $options['WP_ALLOW_MULTISITE'] = true
-            $options['MULTISITE'] = true
-            $options['multidb'] = $multidb
+            $multi_site['WP_ALLOW_MULTISITE'] = true
+            $multi_site['MULTISITE'] = true
+            $multi_site['multidb'] = $multidb
 
-            if $options['multidb'] {
+            if $multi_site['multidb'] {
                 if $options['shardb_prefix'] == undef {
                     $options['shardb_prefix'] = 'wordpress_mu'
                 }
@@ -102,7 +91,7 @@ class lieutdan13::wordpress(
         }
 
         #Merge the options
-        $_options = [ merge($options, $themes) ]
+        $_options = merge($default_options, $multi_site, $options)
 
         # This is the only way I could force unzip to be installed before wordpress was installed
         # Adding require => Package['unzip'] to the wordpress class below was not enough

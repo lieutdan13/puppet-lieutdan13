@@ -24,6 +24,7 @@ class lieutdan13::wordpress(
 ) {
 
     include lieutdan13::essentials
+    $empty_hash = {}
 
     if $db_password == '' {
         notify { "You must define a \$db_password for lieutdan13::wordpress": loglevel => err }
@@ -51,7 +52,7 @@ class lieutdan13::wordpress(
         }
 
         $themes['themes'] = $options['themes'] ? {
-            undef   => {},
+            undef   => $empty_hash,
             default => $options['themes'],
         }
 

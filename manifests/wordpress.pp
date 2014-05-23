@@ -58,7 +58,7 @@ class lieutdan13::wordpress(
         } else {
             $_multi_site = {
                 'WP_ALLOW_MULTISITE' => true,
-                'MULTISITE'          => false,
+                'MULTISITE'          => true,
                 'multidb'            => $multidb,
             }
 

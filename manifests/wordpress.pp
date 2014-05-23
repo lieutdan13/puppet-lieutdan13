@@ -62,7 +62,7 @@ class lieutdan13::wordpress(
                 'multidb'            => $multidb,
             }
 
-            if $multi_site['multidb'] {
+            if $multidb {
                 $multi_db = {}
                 if $options['shardb_prefix'] == undef {
                     $options['shardb_prefix'] = 'wordpress_mu'

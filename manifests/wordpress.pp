@@ -50,8 +50,9 @@ class lieutdan13::wordpress(
             $options['plugins'] = {}
         }
 
-        if $options['themes'] == undef {
-            $options['themes'] = {}
+        $themes['themes'] = $options['themes'] ? {
+            undef   => {},
+            default => $options['themes'],
         }
 
         if $multisite == false {
@@ -99,6 +100,9 @@ class lieutdan13::wordpress(
             }
         }
 
+        #Merge the options
+        $_options = [ merge($options, $themes) ]
+
         # This is the only way I could force unzip to be installed before wordpress was installed
         # Adding require => Package['unzip'] to the wordpress class below was not enough
         file { 'wordpress_dependency_workaround':
@@ -117,7 +121,7 @@ class lieutdan13::wordpress(
             install         => 'source',
             install_source  => $real_install_source,
             my_class        => 'lieutdan13::wordpress::extras',
-            options         => $options,
+            options         => $_options,
             template        => 'lieutdan13/wordpress/wp-config.php.erb',
             web_server      => '',
             web_virtualhost => '',

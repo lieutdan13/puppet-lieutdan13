@@ -3,6 +3,17 @@ class lieutdan13::wordpress::themes {
 
     $theme_options = $::wordpress::options['themes']
 
+    lieutdan13::wordpress::theme { 'responsive':
+        ensure  => $theme_options['responsive'] ? {
+            /(false|absent)/ => absent,
+            default          => present, #If left blank, enable it
+        },
+        version =>  $theme_options['responsive'] ? {
+            /(true|latest)/  => '1.9.6.1', #TODO Put this in a params class
+            default          => $theme_options['responsive'],
+        },
+    }
+
     lieutdan13::wordpress::theme { 'twentytwelve':
         ensure  => $theme_options['twentytwelve'] ? {
             /(false|absent)/ => absent,

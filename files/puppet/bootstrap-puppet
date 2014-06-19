@@ -184,19 +184,32 @@ function install_puppetagent() {
 	read
 
 	selection=""
+	packages=""
 	until [ "$selection" == "C" ] || [ "$selection" == "Q" ]; do
+		if [ "$packages" == "" ]; then
+			echo "We would like to first update all packages for this machine"
+		fi
 		echo -n "Do you want to make the changes to the machine, or just show what will be done? [C]hanges, [T]est (default), [Q]uit: "
 		read selection
 		selection=`echo $selection | tr '[a-z]' '[A-Z]'`
 
 		if [ "$selection" != "Q" ]; then
+			if [ "$packages" == "" ]; then
+				tags="--tags=package"
+			else
+				tags=""
+			fi
 			if [ "$selection" == "C" ]; then
 				noop=""
+				if [ "$packages" == "" ]; then
+					packages=1
+					selection=""
+				fi
 			else
 				noop="--noop"
 				echo "Running Puppet in Test Mode"
 			fi
-			puppet agent --test --server $MASTER_HOST_NAME --waitforcert 30 --pluginsync $noop
+			puppet agent --test --server $MASTER_HOST_NAME --waitforcert 30 --pluginsync $noop $tags
 		fi
 	done
 

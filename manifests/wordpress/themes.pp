@@ -6,6 +6,7 @@ class lieutdan13::wordpress::themes {
     lieutdan13::wordpress::theme { 'responsive':
         ensure  => $theme_options['responsive'] ? {
             /(false|absent)/ => absent,
+           ''                => absent,
             default          => present, #If left blank, enable it
         },
         version =>  $theme_options['responsive'] ? {

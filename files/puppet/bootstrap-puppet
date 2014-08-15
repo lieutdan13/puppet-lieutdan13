@@ -12,6 +12,17 @@ if [ "`whoami`" != "root" ]; then
 	exit 1
 fi
 
+if ! which lsb_release > /dev/null; then
+	if ! which apt-get > /dev/null; then
+		apt-get install lsb-release
+	elif ! which yum > /dev/null; then
+		yum install lsb-release
+	else
+		echo "Unsupported Operating System"
+		exit
+	fi
+fi
+
 OS_FAMILY=`lsb_release -is`
 OS_RELEASE=`lsb_release -rs`
 OS_CODENAME=`lsb_release -cs`
